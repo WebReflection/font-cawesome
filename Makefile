@@ -77,7 +77,7 @@ pages:
 	cp -rf test ~/tmp/$(REPO)
 	cp index.html ~/tmp/$(REPO)
 	git checkout gh-pages
-	cp ~/tmp/ ./
+	cp ~/tmp/.gitignore ./
 	mkdir -p test
 	rm -rf test
 	cp -rf ~/tmp/$(REPO) test
