@@ -1,5 +1,5 @@
 font-cawesome
 =============
 
-[![build status](https://secure.travis-ci.org/WebReflection/font-cawesome.png)](http://travis-ci.org/WebReflection/font-cawesome)
+Just A Canvas Remix for IE9 Mobile and Windows Phone 7
 

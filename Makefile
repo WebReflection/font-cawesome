@@ -1,4 +1,4 @@
-.PHONY: build var node amd size hint clean test web preview pages dependencies
+.PHONY: build var amd size hint clean test web preview pages dependencies
 
 # repository name
 REPO = font-cawesome
@@ -19,10 +19,7 @@ AMD = $(VAR)
 build:
 	make clean
 	make var
-	make node
 	make amd
-	make test
-#	make hint
 	make size
 
 # build generic version
@@ -34,11 +31,6 @@ var:
 	cat template/copyright build/no-copy.$(REPO).js >build/$(REPO).js
 	rm build/no-copy.$(REPO).max.js
 	rm build/no-copy.$(REPO).js
-
-# build node.js version
-node:
-	mkdir -p build
-	cat template/license.before LICENSE.txt template/license.after template/node.before $(NODE) template/node.after >build/$(REPO).node.js
 
 # build AMD version
 amd:
@@ -61,10 +53,6 @@ hint:
 # clean/remove build folder
 clean:
 	rm -rf build
-
-# tests, as usual and of course
-test:
-	npm test
 
 # launch polpetta (ctrl+click to open the page)
 web:
@@ -102,7 +90,6 @@ pages:
 dependencies:
 	rm -rf node_modules
 	mkdir node_modules
-	npm install wru
 	npm install polpetta
 	npm install uglify-js@1
 	npm install jshint
