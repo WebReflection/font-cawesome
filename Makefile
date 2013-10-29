@@ -81,6 +81,7 @@ pages:
 	mkdir -p test
 	rm -rf test
 	cp -rf ~/tmp/$(REPO) test
+	git add .gitignore
 	git add test
 	git add test/.
 	git commit -m 'automatic test generator'
