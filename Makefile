@@ -71,11 +71,13 @@ pages:
 	make var
 	mkdir -p ~/tmp
 	mkdir -p ~/tmp/$(REPO)
+	cp .gitignore ~/tmp/
 	cp -rf src ~/tmp/$(REPO)
 	cp -rf build ~/tmp/$(REPO)
 	cp -rf test ~/tmp/$(REPO)
 	cp index.html ~/tmp/$(REPO)
 	git checkout gh-pages
+	cp ~/tmp/ ./
 	mkdir -p test
 	rm -rf test
 	cp -rf ~/tmp/$(REPO) test
