@@ -5,9 +5,10 @@
         <meta http-equiv="content-language" content="en-US"/>
         <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-        <style>img{margin:4px;}h1{font-family:sans-serif;font-size:24px;}</style>
+        <style>img{margin:4px;}*{font-family:sans-serif;}h1{font-size:24px;}h2{font-size:16px;}</style>
     <body>
-      <h1><a href="http://fortawesome.github.io/Font-Awesome/">Font Awesome</a> (Canvas Remix for IE9 Mobile)</h1>
+      <h1><a href="http://fortawesome.github.io/Font-Awesome/">&copy; Font Awesome</a></h1>
+      <h2>Canvas Remix for IE9 Mobile</h2>
       <div></div>
     </body>
     <script src="build/font-cawesome.js"></script>
@@ -19,7 +20,18 @@
             key;
         for(key in glyphs) {
           div.appendChild(
-            glyphs[key].size(16)
+            // which icon ?
+            glyphs[key].size(
+              // which size ?
+              16,
+              // optionally, which color ?
+              // the color
+              'rgb(' + [
+                Math.round(55 + Math.random() * 150),
+                Math.round(55 + Math.random() * 150),
+                Math.round(55 + Math.random() * 150)
+              ].join(',') + ')'
+            )
           );
         }
       }
