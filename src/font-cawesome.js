@@ -6,6 +6,8 @@ function(canvas){
   // no need to create a canvas per each glyph
   var
     context = canvas.getContext('2d'),
+    // recycled later on
+    glyphs,
     // measurements we might fully need one day
     units, ascent, descent
   ;
@@ -22,7 +24,6 @@ function(canvas){
   function FontCawesome(url, onready) {
     var
       xhr = new XMLHttpRequest,
-      glyphs,
       svg
     ;
     xhr.open('get', url, true);
@@ -42,7 +43,7 @@ function(canvas){
           initGlyph,
           glyphs = {}
         );
-        (onready || automagicallyFixed)(glyphs);
+        (onready ? onready(glyphs) : automagicallyFixed());
       }
     };
     xhr.send(null);
@@ -58,36 +59,13 @@ function(canvas){
   }
 
   // if you wish to let this script do everything at once
-  function automagicallyFixed(glyphs){
+  function automagicallyFixed(el){
 
     Array.prototype.forEach.call(
       // yep, FontAwesome 4.X compatible
-      document.querySelectorAll('.fa'),
-      function (el, i) {
-        var
-          // width = el.offsetWidth, // not needed, all suqares in IE9
-          height = el.offsetHeight, // more or less the font size
-          cs = getComputedStyle(
-            el, ':before'
-          ),
-          content = cs.getPropertyValue('content'),
-          // which char to reproduce ?
-          glyph = glyphs[
-            content.length !== 1 ?
-              // IE9 Mobile here considers
-              // double quotes as content "L"
-              content.charAt(1) :
-              content
-          ].size(
-            height,
-            cs.getPropertyValue('color')
-          )
-        ;
-        // needed if the font is actually rendered
-        // otherwise pointless with all squares
-        // glyph.style.marginRight = (width - height) + 'px';
-        el.parentNode.replaceChild(glyph, el);
-      }
+      (el || document).querySelectorAll('.fa'),
+      replaceElement,
+      glyphs
     );
 
   }
@@ -205,6 +183,32 @@ function(canvas){
     }
   }
 
+  function replaceElement(el) {
+    var
+      // width = el.offsetWidth, // not needed, all suqares in IE9
+      height = el.offsetHeight, // more or less the font size
+      cs = getComputedStyle(
+        el, ':before'
+      ),
+      content = cs.getPropertyValue('content'),
+      // which char to reproduce ?
+      glyph = this[
+        content.length !== 1 ?
+          // IE9 Mobile here considers
+          // double quotes as content "L"
+          content.charAt(1) :
+          content
+      ].size(
+        height,
+        cs.getPropertyValue('color')
+      )
+    ;
+    // needed if the font is actually rendered
+    // otherwise pointless with all squares
+    // glyph.style.marginRight = (width - height) + 'px';
+    el.parentNode.replaceChild(glyph, el);
+  }
+
   // per each usable/valid glyph in the font
   function initGlyph(glyph, i) {
     var d = glyph.getAttribute('d');
@@ -312,6 +316,8 @@ function(canvas){
     // return the freshly backed font icon
     return img;
   }
+
+  FontCawesome.fix = automagicallyFixed;
 
   // here we go
   return FontCawesome;
