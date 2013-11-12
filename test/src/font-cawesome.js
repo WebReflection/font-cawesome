@@ -5,7 +5,12 @@ function(canvas){
   // one canvas, one context
   // no need to create a canvas per each glyph
   var
+    // this browser is death, however it's actually
+    // quite cheap to still support it.
+    webOS = -1 < navigator.userAgent.indexOf('webOSBrowser'),
     context = canvas.getContext('2d'),
+    // recycled later on
+    glyphs,
     // measurements we might fully need one day
     units, ascent, descent
   ;
@@ -22,7 +27,6 @@ function(canvas){
   function FontCawesome(url, onready) {
     var
       xhr = new XMLHttpRequest,
-      glyphs,
       svg
     ;
     xhr.open('get', url, true);
@@ -42,7 +46,7 @@ function(canvas){
           initGlyph,
           glyphs = {}
         );
-        (onready || automagicallyFixed)(glyphs);
+        (onready ? onready(glyphs) : automagicallyFixed());
       }
     };
     xhr.send(null);
@@ -58,36 +62,13 @@ function(canvas){
   }
 
   // if you wish to let this script do everything at once
-  function automagicallyFixed(glyphs){
+  function automagicallyFixed(el){
 
     Array.prototype.forEach.call(
       // yep, FontAwesome 4.X compatible
-      document.querySelectorAll('.fa'),
-      function (el, i) {
-        var
-          // width = el.offsetWidth, // not needed, all suqares in IE9
-          height = el.offsetHeight, // more or less the font size
-          cs = getComputedStyle(
-            el, ':before'
-          ),
-          content = cs.getPropertyValue('content'),
-          // which char to reproduce ?
-          glyph = glyphs[
-            content.length !== 1 ?
-              // IE9 Mobile here considers
-              // double quotes as content "L"
-              content.charAt(1) :
-              content
-          ].size(
-            height,
-            cs.getPropertyValue('color')
-          )
-        ;
-        // needed if the font is actually rendered
-        // otherwise pointless with all squares
-        // glyph.style.marginRight = (width - height) + 'px';
-        el.parentNode.replaceChild(glyph, el);
-      }
+      (el || document).querySelectorAll('.fa'),
+      replaceElement,
+      glyphs
     );
 
   }
@@ -111,10 +92,9 @@ function(canvas){
       current
     ;
     canvas.width = canvas.height = Math.round(ratio * units);
-    context.translate(0, canvas.height);
-    context.scale(1, -1);
+    context.setTransform(1, 0, 0, -1, 0, canvas.height);
     context.fillStyle = fillStyle || 'rgb(0,0,0)';
-    context.globalCompositeOperation = 'xor';
+    context.globalCompositeOperation = 'source-over';
     while(i < length) {
       current = actions[i++];
       relative = 1;
@@ -205,6 +185,32 @@ function(canvas){
     }
   }
 
+  function replaceElement(el) {
+    var
+      // width = el.offsetWidth, // not needed, all suqares in IE9
+      height = el.offsetHeight, // more or less the font size
+      cs = getComputedStyle(
+        el, ':before'
+      ),
+      content = cs.getPropertyValue('content'),
+      // which char to reproduce ?
+      glyph = this[
+        content.length !== 1 ?
+          // IE9 Mobile here considers
+          // double quotes as content "L"
+          content.charAt(1) :
+          content
+      ].size(
+        height,
+        cs.getPropertyValue('color')
+      )
+    ;
+    // needed if the font is actually rendered
+    // otherwise pointless with all squares
+    // glyph.style.marginRight = (width - height) + 'px';
+    el.parentNode.replaceChild(glyph, el);
+  }
+
   // per each usable/valid glyph in the font
   function initGlyph(glyph, i) {
     var d = glyph.getAttribute('d');
@@ -287,7 +293,7 @@ function(canvas){
 
   // common method shared across all glyphs
   function size(width, fillStyle) {
-    var img = new Image;
+    var img;
     drawPath(
       // create actions once per path
       this._actions || (
@@ -299,19 +305,29 @@ function(canvas){
       // the desired color, if any
       fillStyle
     );
-    // export an image
-    img.src = canvas.toDataURL();
+    if (webOS) {
+      img = canvas;
+      canvas = document.createElement('canvas');
+      context = canvas.getContext('2d');
+    } else {
+      img = new Image;
+      // export an image
+      img.src = canvas.toDataURL();
+      // clean the canvas
+      context.clearRect(0, 0, units, units);
+    }
     // force the meant size via CSS
     // (for sharper result in higher DPI)
     img.style.cssText =
       'width:' + width + 'px;' +
       'height:' + width + 'px;'
     ;
-    // clean the canvas
-    context.clearRect(0, 0, units, units);
+    img.className = 'fa-ke';
     // return the freshly backed font icon
     return img;
   }
+
+  FontCawesome.fix = automagicallyFixed;
 
   // here we go
   return FontCawesome;
