@@ -34,7 +34,7 @@ function(canvas){
       if (xhr.readyState == 4) {
         svg = xhr.responseXML;
         // apparently IE9 mobile has some problem here too ... 
-        if (!svg.firstChild) {
+        if (!svg || !svg.firstChild) {
           svg = document.createElement('div');
           svg.innerHTML = xhr.responseText;
         }
