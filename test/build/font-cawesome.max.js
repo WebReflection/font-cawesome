@@ -116,7 +116,7 @@ var FontCawesome = function(canvas){
     canvas.width = canvas.height = Math.round(ratio * units);
     context.setTransform(1, 0, 0, -1, 0, canvas.height);
     context.fillStyle = fillStyle || 'rgb(0,0,0)';
-    context.globalCompositeOperation = 'source-over';
+    context.globalCompositeOperation = 'xor';
     while(i < length) {
       current = actions[i++];
       relative = 1;
